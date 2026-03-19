@@ -1,0 +1,17 @@
+{
+	"name": "Schemas",
+	"properties": {
+		"content": {
+			"query": "CREATE SCHEMA silver_schema;\n\nCREATE SCHEMA gold_schema;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Sales_DWH",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "Dimensions",
+	"properties": {
+		"content": {
+			"query": "-------------------------------\n\n--- Dim Customer --------------\n\nIF NOT EXISTS (\n    SELECT *\n    FROM sys.tables t\n    JOIN sys.schemas s ON t.schema_id = s.schema_id\n    WHERE t.name = 'DimCustomer' AND s.name = 'gold_schema'\n)\nCREATE EXTERNAL TABLE gold_schema.DimCustomer \nWITH\n(\n    LOCATION = 'DimCustomer',\n    DATA_SOURCE = gold_source,\n    FILE_FORMAT = parquet_format\n)\nAS\n SELECT *, ROW_NUMBER() OVER (ORDER BY CustomerID) AS DimCustomerKey\n FROM\n(\nSELECT\nDISTINCT\n    CustomerID,\n    CustomerEmail,\n    CustomerName,\n    Domain,\n    First_Name\n    FROM silver_schema.silverTable \n    )\n    t\n\n---------------------------------------\n\n--- Dim Product ----------------------\nIF NOT EXISTS (SELECT * from sys.tables t join sys.schemas s on t.schema_id = s.schema_id where t.name='DimProduct' AND s.name='gold_schema')\n    CREATE EXTERNAL TABLE gold_schema.DimProduct \n    WITH \n    (\n        LOCATION = 'DimProduct',\n        DATA_SOURCE = gold_source,\n        FILE_FORMAT = parquet_format\n    )\n    AS\n     SELECT *,\n           ROW_NUMBER() OVER (ORDER BY ProductID) AS DimProductKey\n    FROM\n    (\n    SELECT \n    DISTINCT\n    ProductID,\n    ProductName,\n    ProductCategory\n    FROM silver_schema.silverTable\n    ) t\n\n------------------------------\n\n-- Dim Geopgraphy ------------\n\nIF NOT EXISTS (SELECT * from sys.tables t join sys.schemas s on t.schema_id = s.schema_id where t.name='DimGeography' AND s.name='gold_schema')\n    CREATE EXTERNAL TABLE gold_schema.DimGeography\n    WITH \n    (\n        LOCATION = 'DimGeography',\n        DATA_SOURCE = gold_source,\n        FILE_FORMAT = parquet_format\n    )\n    AS\n     SELECT *,\n           ROW_NUMBER() OVER (ORDER BY RegionID) AS DimGeographyKey\n           FROM\n    (\n        SELECT \n    DISTINCT\n    RegionID,\n    RegionName,\n    Country\n    FROM silver_schema.silverTable\n    ) t\n\n\n------------------------------------\n\n--- Dim Orders ---------------------\n\nIF NOT EXISTS (SELECT * from sys.tables t join sys.schemas s on t.schema_id = s.schema_id where t.name='DimOrders' AND s.name='gold_schema')\n    CREATE EXTERNAL TABLE gold_schema.DimOrders\n    WITH \n    (\n        LOCATION = 'DimOrders',\n        DATA_SOURCE = gold_source,\n        FILE_FORMAT = parquet_format\n    )\n    AS\n    SELECT \n    OrderID,\n    OrderDate,\n    CustomerID,\n    CustomerName,\n    CustomerEmail,\n    Domain,\n    First_Name,\n    ProductID,\n    ProductName,\n    ProductCategory,\n    RegionID,\n    RegionName,\n    Country,\n    ROW_NUMBER() OVER (ORDER BY OrderID) AS DimOrdersKey\n    FROM silver_schema.silverTable\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Sales_DWH",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

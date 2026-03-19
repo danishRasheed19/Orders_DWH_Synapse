@@ -1,0 +1,17 @@
+{
+	"name": "DWH_script",
+	"properties": {
+		"content": {
+			"query": "CREATE MASTER KEY ENCRYPTION BY PASSWORD ='Osaka@cisco#123'\n-----------------------------------\n--- DATABASE SCOPED CREDENTIAL ----\nCREATE DATABASE SCOPED CREDENTIAL danish_creds\nWITH IDENTITY = 'Managed Identity'\n------------------------------------\n-- External Data Source ------------\n\nCREATE EXTERNAL DATA SOURCE silver_source\nWITH\n(\n    LOCATION = 'https://azuredwhlakedrasheed.dfs.core.windows.net/silver',\n    CREDENTIAL = danish_creds\n)\n------------------------------------\n\n--- External File Formats ----------\n\nCREATE EXTERNAL FILE FORMAT parquet_format\nWITH\n(\n FORMAT_TYPE = PARQUET\n)\n\nCREATE EXTERNAL FILE FORMAT delta_format\nWITH\n(\n    FORMAT_TYPE = DELTA\n)\n\n------------------------------------\n\n---- Gold Source -------------------\n\nCREATE EXTERNAL DATA SOURCE gold_source\nWITH\n(\n    LOCATION = 'https://azuredwhlakedrasheed.dfs.core.windows.net/gold',\n    CREDENTIAL = danish_creds\n)\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "Sales_DWH",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
